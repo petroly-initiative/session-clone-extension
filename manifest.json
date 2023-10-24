@@ -1,0 +1,24 @@
+{
+  "name": "Banner session clone",
+  "version": "0.1.0",
+  "description": "Clone the banner session to your Petroly account.",
+  "manifest_version": 3,
+  "author": "Petroly Initiative",
+  "action":{
+    "default_popup": "index.html",
+    "default_title": "Connect"
+  },
+  "host_permissions": [
+    "https://*.kfupm.edu.sa/*",
+    "https://*.petroly.co/*",
+    "https://petroly.co/*"
+  ],
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "storage",
+    "sessions",
+    "cookies",
+    "notifications"
+  ]
+}
