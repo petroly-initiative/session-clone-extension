@@ -19,6 +19,7 @@
     "storage",
     "sessions",
     "cookies",
-    "notifications"
+    "notifications",
+    "scripting"
   ]
 }
