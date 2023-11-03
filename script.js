@@ -1,40 +1,90 @@
-document.getElementById("getCookies").addEventListener("click", function () {
+const ENDPOINT = "http://localhost:8000/endpoint/";
+
+document.getElementById("clone-btn").addEventListener("click", setupAndClone);
+
+function setupAndClone() {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
-    const url = new URL(tab.url);
+    // const url = new URL(tab.url);
 
-    const fromPageLocalStore = chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => {
-        console.log(sessionStorage);
-        return JSON.stringify(sessionStorage);
-      }
-    })
-    fromPageLocalStore.then((res) => {
-      const token = JSON.parse(res[0].result).token;
-      console.log(token);
-      checkApi(token);
-    });
+    chrome.scripting
+      .executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          console.log(sessionStorage);
+          return JSON.stringify(sessionStorage);
+        },
+      })
+      .then(tokenCallback)
+      .then(getCookies)
+      .then(saveCookies)
+      .catch((err) => {
+        console.error(err);
+      });
   });
-});
 
-
-function getCookies(){
-  chrome.cookies.getAll(Object(), function (cookies) {
-    console.log("Cookies for " + url.origin + ":");
-    console.log(cookies);
-    console.log(JSON.stringify(cookies));
-    });
-  return cookies;
+  // save cookies into Petroly
 }
 
-document.getElementById("getSessionStorage").addEventListener("click", function () {
-  const sessionData = { ...sessionStorage };
-  console.log("Session Storage Data:");
-  console.log(sessionData);
-});
+var token = "";
 
-function checkApi(token){
+function tokenCallback(res) {
+  token = JSON.parse(res[0].result).token;
+
+  // retreive user from Petrly as a check test
+  // checkApi(token);
+
+  return token;
+}
+
+function getCookies(token) {
+  // get cookies
+  return chrome.cookies.getAll(Object());
+}
+
+function saveCookies(cookies) {
+  console.log(cookies);
+  console.log(token);
+
+  const query = `
+    mutation Save($cookiesStr: String!) {
+      saveBannerSession(cookies: $cookiesStr)
+    }
+  `;
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `JWT ${token}`,
+    },
+    body: JSON.stringify({
+      query,
+      variables: { cookiesStr: JSON.stringify(cookies) },
+    }),
+  };
+
+  fetch(ENDPOINT, options)
+    .then((response) => response.json())
+    .then((data) => {
+      // Handle the GraphQL response data here
+      console.log(data);
+      if (data.data) {
+        showSuccessAlert();
+      } else {
+        console.log(data.errors);
+        if (data.errors) {
+          showErrorAlert(data.errors[0].message);
+        }
+      }
+    })
+    .catch((error) => {
+      // Handle any errors that occurred during the request
+      console.error("Error:", error);
+    });
+}
+
+function checkApi(token) {
   const query = `
     query {
       me {
@@ -44,22 +94,59 @@ function checkApi(token){
   `;
 
   const options = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      authorization: `JWT ${token}`
+      "Content-Type": "application/json",
+      authorization: `JWT ${token}`,
     },
     body: JSON.stringify({ query }),
   };
 
-  fetch('https://api.petroly.co/', options)
-    .then(response => response.json())
-    .then(data => {
+  fetch(ENDPOINT, options)
+    .then((response) => response.json())
+    .then((data) => {
       // Handle the GraphQL response data here
       console.log(data);
     })
-    .catch(error => {
+    .catch((error) => {
       // Handle any errors that occurred during the request
-      console.error('Error:', error);
-  });
+      console.error("Error:", error);
+    });
+}
+
+function showSuccessAlert() {
+  const el = document.getElementById("alerts");
+  const msgDiv = `<div
+          class="alert alert-success alert-dismissible fade show"
+          role="alert"
+        >
+          <strong>Done !</strong> We cloned your Banner session,
+            now we'll manage it for you :)
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+`;
+  el.innerHTML = msgDiv;
+}
+
+function showErrorAlert(msg) {
+  const el = document.getElementById("alerts");
+  const msgDiv = `<div
+          class="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
+          <strong>Error!</strong> ${msg}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+`;
+  el.innerHTML = msgDiv;
 }

@@ -1,11 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <title>Cookie Getter</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=500, initial-scale=1" />
+    <title>Session Clone</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <button id="getCookies">Get Cookies</button>
-    <button id="getSessionStorage">Get Session Storage</button>
-    <script src="script.js"></script>
+  <body class="bg-dark">
+    <div class="container p-3">
+      <div class="row" id="alerts"></div>
+      <div class="row">
+        <img src="https://www.petroly.co/header-plain.svg" alt="Petroly.co" />
+      </div>
+      <div class="row text-white fs-6">
+        <ul>
+          <li>You must have Petroly.co and Banner opened and logged in.</li>
+          <li>The active tab must be the Petorly one.</li>
+        </ul>
+      </div>
+      <div class="row mb-4 mt-5">
+        <div class="col position-relative">
+          <button
+            class="btn btn-primary position-absolute top-50 start-50 translate-middle"
+            id="clone-btn"
+          >
+            Clone Session
+          </button>
+        </div>
+        <script src="script.js"></script>
+      </div>
+    </div>
+    <script src="bootstrap.bundle.min.js"></script>
   </body>
 </html>
