@@ -1,4 +1,5 @@
-const ENDPOINT = "http://localhost:8000/endpoint/";
+let ENDPOINT = "http://localhost:8000/endpoint/";
+ENDPOINT = "https://api.petroly.co/";
 
 document.getElementById("clone-btn").addEventListener("click", setupAndClone);
 
@@ -39,7 +40,7 @@ function tokenCallback(res) {
 
 function getCookies(token) {
   // get cookies
-  return chrome.cookies.getAll(Object());
+  return chrome.cookies.getAll({ domain: "kfupm.edu.sa" });
 }
 
 function saveCookies(cookies) {
