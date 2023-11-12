@@ -4,6 +4,7 @@ ENDPOINT = "https://api.petroly.co/";
 document.getElementById("clone-btn").addEventListener("click", setupAndClone);
 
 function setupAndClone() {
+  showWaiting();
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const tab = tabs[0];
     // const url = new URL(tab.url);
@@ -65,24 +66,36 @@ function saveCookies(cookies) {
     }),
   };
 
-  fetch(ENDPOINT, options)
-    .then((response) => response.json())
-    .then((data) => {
-      // Handle the GraphQL response data here
-      console.log(data);
-      if (data.data) {
-        showSuccessAlert();
+  chrome.cookies.remove(
+    { url: "https://login.kfupm.edu.sa/", name: "commonAuthId" },
+    function (removedCookie) {
+      console.log(removedCookie)
+      if (removedCookie === null) {
+        showErrorAlert(
+          "We didn't find cookies, sign out and in again in Banner/Portal.",
+        );
       } else {
-        console.log(data.errors);
-        if (data.errors) {
-          showErrorAlert(data.errors[0].message);
-        }
+        fetch(ENDPOINT, options)
+          .then((response) => response.json())
+          .then((data) => {
+            // Handle the GraphQL response data here
+            console.log(data);
+            if (data.data) {
+              showSuccessAlert();
+            } else {
+              console.log(data.errors);
+              if (data.errors) {
+                showErrorAlert(data.errors[0].message);
+              }
+            }
+          })
+          .catch((error) => {
+            // Handle any errors that occurred during the request
+            console.error("Error:", error);
+          });
       }
-    })
-    .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error("Error:", error);
-    });
+    },
+  );
 }
 
 function checkApi(token) {
@@ -113,6 +126,14 @@ function checkApi(token) {
       // Handle any errors that occurred during the request
       console.error("Error:", error);
     });
+}
+
+function showWaiting() {
+  const el = document.getElementById("alerts");
+  const msgDiv = `
+    <img src="progress-bar.png">
+`;
+  el.innerHTML = msgDiv;
 }
 
 function showSuccessAlert() {
