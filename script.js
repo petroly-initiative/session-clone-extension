@@ -66,36 +66,39 @@ function saveCookies(cookies) {
     }),
   };
 
+  const cookiesExist = cookies.some((obj) => obj.name == "commonAuthId");
+
   chrome.cookies.remove(
     { url: "https://login.kfupm.edu.sa/", name: "commonAuthId" },
-    function (removedCookie) {
-      console.log(removedCookie)
-      if (removedCookie === null) {
-        showErrorAlert(
-          "We didn't find cookies, sign out and in again in Banner/Portal.",
-        );
-      } else {
-        fetch(ENDPOINT, options)
-          .then((response) => response.json())
-          .then((data) => {
-            // Handle the GraphQL response data here
-            console.log(data);
-            if (data.data) {
-              showSuccessAlert();
-            } else {
-              console.log(data.errors);
-              if (data.errors) {
-                showErrorAlert(data.errors[0].message);
-              }
-            }
-          })
-          .catch((error) => {
-            // Handle any errors that occurred during the request
-            console.error("Error:", error);
-          });
-      }
+    (removedCookie) => {
+      console.log(removedCookie);
     },
   );
+
+  if (cookiesExist) {
+    fetch(ENDPOINT, options)
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle the GraphQL response data here
+        console.log(data);
+        if (data.data) {
+          showSuccessAlert();
+        } else {
+          console.log(data.errors);
+          if (data.errors) {
+            showErrorAlert(data.errors[0].message);
+          }
+        }
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the request
+        console.error("Error:", error);
+      });
+  } else {
+    showErrorAlert(
+      "Cookies've been eaten, sign out and in again in Banner/Portal.",
+    );
+  }
 }
 
 function checkApi(token) {
