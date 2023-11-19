@@ -11,8 +11,7 @@
   "host_permissions": [
     "https://*.kfupm.edu.sa/*",
     "https://*.petroly.co/*",
-    "https://petroly.co/*",
-    "http://localhost:3000/*"
+    "https://petroly.co/*"
   ],
   "permissions": [
     "activeTab",
