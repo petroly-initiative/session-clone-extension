@@ -1,10 +1,10 @@
 {
   "name": "Banner session clone",
-  "version": "0.1.0",
-  "description": "Clone the banner session to your Petroly account.",
+  "version": "0.2.0",
+  "description": "Clone the banner session to your Petroly account, and show hidden terms.",
   "manifest_version": 3,
   "author": "Petroly Initiative",
-  "action":{
+  "action": {
     "default_popup": "index.html",
     "default_title": "Connect"
   },
@@ -21,5 +21,13 @@
     "cookies",
     "notifications",
     "scripting"
+  ],
+  "content_scripts": [
+    {
+      "js": ["inject-terms.js"],
+      "matches": [
+        "https://banner9-registration.kfupm.edu.sa/StudentRegistrationSsb/ssb/registrationHistory/*"
+      ]
+    }
   ]
 }

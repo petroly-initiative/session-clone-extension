@@ -1,7 +1,20 @@
 let ENDPOINT = "http://localhost:8000/endpoint/";
 ENDPOINT = "https://api.petroly.co/";
+const HISTORY_URL =
+  "https://banner9-registration.kfupm.edu.sa/StudentRegistrationSsb/ssb/registrationHistory/registrationHistory";
 
-document.getElementById("clone-btn").addEventListener("click", setupAndClone);
+window.onload = function () {
+  document.getElementById("clone-btn").addEventListener("click", setupAndClone);
+  document
+    .getElementById("terms-btn")
+    .addEventListener("click", showHiddenTerms);
+};
+
+function showHiddenTerms() {
+  chrome.tabs.create({
+    url: HISTORY_URL,
+  });
+}
 
 function setupAndClone() {
   showWaiting();
@@ -22,6 +35,7 @@ function setupAndClone() {
       .then(saveCookies)
       .catch((err) => {
         console.error(err);
+        showErrorAlert('Make sure you follow the instructions bellow.')
       });
   });
 
